@@ -1,5 +1,7 @@
 package com.tableOrder.table_order.util.exception;
 
+import com.tableOrder.table_order.util.ErrorCode;
+
 public class CustomException extends RuntimeException {
 
     private ErrorCode errorCode;

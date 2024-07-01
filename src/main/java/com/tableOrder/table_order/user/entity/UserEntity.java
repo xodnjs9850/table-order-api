@@ -2,6 +2,7 @@ package com.tableOrder.table_order.user.entity;
 
 import com.tableOrder.table_order.user.model.UserRole;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
@@ -39,9 +41,6 @@ public class UserEntity {
     @CreatedDate
     @Column
     private LocalDateTime createdAt;
-
-
-
 
 
 }
