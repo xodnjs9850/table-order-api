@@ -4,7 +4,7 @@ info:
   description: table-order-api
   version: 0.1.9
 servers:
-  - url: http://127.0.0.1:4443/api
+  - url: http://127.0.0.1:8000/api
     description: api server
 paths:
   /auth/signIn:
