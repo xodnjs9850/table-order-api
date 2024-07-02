@@ -20,8 +20,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("signUp")
-    @ResponseBody
-    public ResponseEntity<?> signUp(SignUpRequest signUpRequest) {
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequest signUpRequest) {
+
         return authService
                 .signUp(signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getName())
                 .map(response -> ResponseEntity.ok().build())

@@ -9,19 +9,19 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @Builder
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
     @Id
-    @GeneratedValue
-    @Column(unique = true, nullable = false, columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    private Integer id;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -38,9 +38,8 @@ public class UserEntity {
     @Column
     private UserRole userRole;
 
+    @Column(updatable = false)
     @CreatedDate
-    @Column
     private LocalDateTime createdAt;
-
 
 }
