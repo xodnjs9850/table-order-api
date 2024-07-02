@@ -29,4 +29,5 @@ logging.level:
 
 jwt:
   expiration_time: 86400000
-  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+  refresh_expiration_time: 2592000000
+  secret: ${JWT_SECRET:hLnRjrqvRoZTQ2Rr/HthHPI0vI4eRaYKjK2vyTcqbZYbcxm5Sdeqf3NJo+EPcwo6kx9YNJ0XyWDtFlxdNURlPg==}

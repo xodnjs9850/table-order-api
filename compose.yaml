@@ -7,6 +7,21 @@ services:
     environment:
       - URLS_PRIMARY_NAME=agent
       - "URLS=[{ url: 'docs/openapi.yaml', name: 'agent' }]"
-      - SUPPORTED_SUBMIT_METHODS=['get']
+      - SUPPORTED_SUBMIT_METHODS=['get', 'post', 'update', 'delete']
     volumes:
       - ./docs:/usr/share/nginx/html/docs
+
+  db:
+    image: mysql:8.0.22
+    container_name: mysql_boot
+    hostname: mysql_boot
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: tableOrderDB
+      MYSQL_ROOT_PASSWORD: toor
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+      - ./db/mysql/config:/etc/mysql/conf.d

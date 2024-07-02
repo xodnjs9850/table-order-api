@@ -20,3 +20,83 @@ paths:
                 type: array
                 items:
                   type: string
+  /auth/signUp:
+    post:
+      summary: 회원가입
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  pattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+                  description: "이메일"
+                  example: "test@test.com"
+                password:
+                  type: string
+                  description: "비밀번호"
+                name:
+                  type: string
+                  example: John Doe
+      responses:
+        "200":
+          description: 회원가입 성공
+        "400":
+          description: 회원가입 오류
+          content:
+            application/json:
+              examples:
+                "이메일이 이미 존재합니다.":
+                  value:
+                    code: EMAIL_DUPLICATION
+                    message: "이메일이 이미 존재합니다."
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorMessage:
+      discriminator:
+        propertyName: code
+        mapping:
+          #
+          # 400
+          EMAIL_DUPLICATION: "#/components/schemas/EmailAlreadyExistsError"
+          # 403
+          HANDLE_ACCESS_DENIED: "#/components/schemas/NoPermissionError"
+        oneOf:
+          - $ref: "#/components/schemas/EmailAlreadyExistsError"
+          - $ref: "#/components/schemas/NoPermissionError"
+    EmailAlreadyExistsError:
+      description: "<p>이메일이 이미 존재합니다.</p>"
+      type: object
+      properties:
+        code:
+          type: string
+          description: "에러코드"
+        message:
+          type: string
+          description: "에러 메세지"
+    NoPermissionError:
+      description: "<p>권한이 없습니다.</p>"
+      type: object
+      properties:
+        code:
+          type: string
+          description: "에러코드"
+        message:
+          type: string
+          description: "에러 메세지"
