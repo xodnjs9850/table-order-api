@@ -1,5 +1,6 @@
 package com.tableOrder.table_order.util;
 
+import com.tableOrder.table_order.user.model.UserRole;
 import com.tableOrder.table_order.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -13,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -39,6 +41,34 @@ public class JwtUtil implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public UUID extractId(String token) {
+        return UUID.fromString(extractClaim(token, claims -> claims.get("id", String.class)));
+    }
+
+    public UserRole extractUserRole(String token) {
+        return extractClaim(token, claims -> UserRole.fromPermission(claims.get("role", Integer.class)));
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<String, Object>(), userDetails);
+    }
+
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, expiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
 
     private String buildToken(
             Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
@@ -54,12 +84,14 @@ public class JwtUtil implements InitializingBean {
                 .compact();
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, expiration);
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    public boolean isIssuedBeforeLastTokenIssuedAt(String token, Date lastTokenIssuedAt) {
+        final Date issuedAt = extractIssuedAt(token);
+        return issuedAt.before(lastTokenIssuedAt);
     }
 
     public boolean isTokenValid(String token) {
@@ -82,13 +114,12 @@ public class JwtUtil implements InitializingBean {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Date extractIssuedAt(String token) {
+        return extractClaim(token, Claims::getIssuedAt);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     private Claims extractAllClaims(String token) {

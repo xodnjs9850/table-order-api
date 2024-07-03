@@ -1,9 +1,11 @@
 package com.tableOrder.table_order.auth.service;
 
+import com.tableOrder.table_order.auth.model.CustomUserDetails;
 import com.tableOrder.table_order.auth.model.Token;
 import com.tableOrder.table_order.user.entity.UserEntity;
 import com.tableOrder.table_order.user.model.UserRole;
 import com.tableOrder.table_order.user.repository.UserRepository;
+import com.tableOrder.table_order.util.JwtUtil;
 import com.tableOrder.table_order.util.exception.BadCredentialsException;
 import com.tableOrder.table_order.util.exception.EmailAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -21,6 +25,7 @@ public class AuthService {
     static Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public Optional<String> signUp(
             final String email,
@@ -54,8 +59,25 @@ public class AuthService {
         if (!passwordEncoder.matches(password, user.getEncryptedPassword())) {
             throw new BadCredentialsException("패스워드가 일치하지 않습니다.");
         }
+        return refreshCredentialsToken(user);
+    }
 
-        return Optional.empty();
+
+
+    private Optional<Token> refreshCredentialsToken(final UserEntity user) {
+        var userDetails = CustomUserDetails.builder().user(user).build();
+
+        var extraClaims = new HashMap<String, Object>();
+        extraClaims.put("role", user.getUserRole().getPermission());
+        extraClaims.put("id", user.getId());
+
+        var token = jwtUtil.generateToken(extraClaims, userDetails);
+        var refreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return Optional.of(Token.builder().accessToken(token).refreshToken(refreshToken).build());
     }
 
 }

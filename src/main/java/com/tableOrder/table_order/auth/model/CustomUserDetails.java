@@ -2,16 +2,19 @@ package com.tableOrder.table_order.auth.model;
 
 import com.tableOrder.table_order.user.entity.UserEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@Builder
 public class CustomUserDetails implements UserDetails {
 
     private final UserEntity user;
@@ -31,5 +34,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    public LocalDateTime getLastTokenIssuedAt() {
+        return user.getLastTokenIssuedAt();
     }
 }

@@ -7,7 +7,7 @@ services:
     environment:
       - URLS_PRIMARY_NAME=agent
       - "URLS=[{ url: 'docs/openapi.yaml', name: 'agent' }]"
-      - SUPPORTED_SUBMIT_METHODS=['get', 'post', 'update', 'delete']
+      - SUPPORTED_SUBMIT_METHODS=['get', 'post', 'update', 'delete', 'put']
     volumes:
       - ./docs:/usr/share/nginx/html/docs
 

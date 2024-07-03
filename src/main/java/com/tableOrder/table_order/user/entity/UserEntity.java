@@ -2,9 +2,7 @@ package com.tableOrder.table_order.user.entity;
 
 import com.tableOrder.table_order.user.model.UserRole;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
@@ -41,5 +41,11 @@ public class UserEntity {
     @Column(updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column
+    private String refreshToken;
+
+    @Column
+    private LocalDateTime lastTokenIssuedAt;
 
 }
